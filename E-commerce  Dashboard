@@ -1,0 +1,618 @@
+// The exported code uses Tailwind CSS. Install Tailwind CSS in your dev environment to ensure all styles work.
+
+import React, { useState, useEffect } from 'react';
+import * as echarts from 'echarts';
+
+const App: React.FC = () => {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [activeNav, setActiveNav] = useState('dashboard');
+  const [dateRange, setDateRange] = useState('7d');
+  const [notifications, setNotifications] = useState(3);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
+
+  useEffect(() => {
+    // Initialize sales chart
+    const salesChartElement = document.getElementById('sales-chart');
+    if (salesChartElement) {
+      const salesChart = echarts.init(salesChartElement);
+      const salesOption = {
+        animation: false,
+        tooltip: {
+          trigger: 'axis'
+        },
+        legend: {
+          data: ['Revenue', 'Orders']
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [
+          {
+            name: 'Revenue',
+            type: 'line',
+            data: [15000, 13000, 18000, 16000, 19000, 22000, 23000],
+            smooth: true,
+            lineStyle: {
+              color: '#4F46E5'
+            },
+            areaStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: 'rgba(79, 70, 229, 0.3)' },
+                { offset: 1, color: 'rgba(79, 70, 229, 0.1)' }
+              ])
+            }
+          },
+          {
+            name: 'Orders',
+            type: 'line',
+            data: [320, 302, 341, 374, 390, 450, 420],
+            smooth: true,
+            lineStyle: {
+              color: '#10B981'
+            },
+            areaStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: 'rgba(16, 185, 129, 0.3)' },
+                { offset: 1, color: 'rgba(16, 185, 129, 0.1)' }
+              ])
+            }
+          }
+        ]
+      };
+      salesChart.setOption(salesOption);
+
+      window.addEventListener('resize', () => {
+        salesChart.resize();
+      });
+
+      return () => {
+        salesChart.dispose();
+        window.removeEventListener('resize', () => {
+          salesChart.resize();
+        });
+      };
+    }
+  }, []);
+
+  useEffect(() => {
+    // Initialize revenue distribution chart
+    const revenueChartElement = document.getElementById('revenue-chart');
+    if (revenueChartElement) {
+      const revenueChart = echarts.init(revenueChartElement);
+      const revenueOption = {
+        animation: false,
+        tooltip: {
+          trigger: 'item'
+        },
+        legend: {
+          orient: 'vertical',
+          right: 10,
+          top: 'center'
+        },
+        series: [
+          {
+            name: 'Revenue Distribution',
+            type: 'pie',
+            radius: ['40%', '70%'],
+            avoidLabelOverlap: false,
+            itemStyle: {
+              borderRadius: 10,
+              borderColor: '#fff',
+              borderWidth: 2
+            },
+            label: {
+              show: false,
+              position: 'center'
+            },
+            emphasis: {
+              label: {
+                show: true,
+                fontSize: '14',
+                fontWeight: 'bold'
+              }
+            },
+            labelLine: {
+              show: false
+            },
+            data: [
+              { value: 48, name: 'Electronics' },
+              { value: 22, name: 'Clothing' },
+              { value: 15, name: 'Home & Garden' },
+              { value: 10, name: 'Sports' },
+              { value: 5, name: 'Other' }
+            ]
+          }
+        ]
+      };
+      revenueChart.setOption(revenueOption);
+
+      window.addEventListener('resize', () => {
+        revenueChart.resize();
+      });
+
+      return () => {
+        revenueChart.dispose();
+        window.removeEventListener('resize', () => {
+          revenueChart.resize();
+        });
+      };
+    }
+  }, []);
+
+  useEffect(() => {
+    // Initialize order status chart
+    const orderChartElement = document.getElementById('order-chart');
+    if (orderChartElement) {
+      const orderChart = echarts.init(orderChartElement);
+      const orderOption = {
+        animation: false,
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
+          }
+        },
+        legend: {
+          data: ['Completed', 'Pending', 'Cancelled']
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true
+        },
+        xAxis: [
+          {
+            type: 'category',
+            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+          }
+        ],
+        yAxis: [
+          {
+            type: 'value'
+          }
+        ],
+        series: [
+          {
+            name: 'Completed',
+            type: 'bar',
+            stack: 'total',
+            emphasis: {
+              focus: 'series'
+            },
+            itemStyle: {
+              color: '#10B981'
+            },
+            data: [120, 132, 101, 134, 90, 230, 210]
+          },
+          {
+            name: 'Pending',
+            type: 'bar',
+            stack: 'total',
+            emphasis: {
+              focus: 'series'
+            },
+            itemStyle: {
+              color: '#F59E0B'
+            },
+            data: [60, 72, 71, 74, 190, 130, 110]
+          },
+          {
+            name: 'Cancelled',
+            type: 'bar',
+            stack: 'total',
+            emphasis: {
+              focus: 'series'
+            },
+            itemStyle: {
+              color: '#EF4444'
+            },
+            data: [20, 32, 21, 34, 29, 30, 20]
+          }
+        ]
+      };
+      orderChart.setOption(orderOption);
+
+      window.addEventListener('resize', () => {
+        orderChart.resize();
+      });
+
+      return () => {
+        orderChart.dispose();
+        window.removeEventListener('resize', () => {
+          orderChart.resize();
+        });
+      };
+    }
+  }, []);
+
+  const toggleSidebar = () => {
+    setSidebarCollapsed(!sidebarCollapsed);
+  };
+
+  const recentOrders = [
+    { id: '#ORD-7352', customer: 'John Smith', status: 'Completed', amount: '$235.89', date: '2025-04-24' },
+    { id: '#ORD-7351', customer: 'Emma Wilson', status: 'Processing', amount: '$125.99', date: '2025-04-24' },
+    { id: '#ORD-7350', customer: 'Michael Brown', status: 'Completed', amount: '$432.25', date: '2025-04-23' },
+    { id: '#ORD-7349', customer: 'Sophia Davis', status: 'Cancelled', amount: '$89.50', date: '2025-04-23' },
+    { id: '#ORD-7348', customer: 'James Johnson', status: 'Completed', amount: '$176.00', date: '2025-04-22' }
+  ];
+
+  const topProducts = [
+    { id: 1, name: 'Wireless Headphones', price: '$129.99', stock: 45, sales: 189, image: 'https://readdy.ai/api/search-image?query=Premium%20wireless%20headphones%20with%20noise%20cancellation%20feature%2C%20sleek%20modern%20design%2C%20black%20color%20with%20silver%20accents%2C%20minimalist%20product%20photography%20on%20clean%20white%20background%2C%20professional%20product%20shot%20with%20soft%20shadows&width=80&height=80&seq=prod1&orientation=squarish' },
+    { id: 2, name: 'Smart Watch Series 5', price: '$299.99', stock: 32, sales: 145, image: 'https://readdy.ai/api/search-image?query=Modern%20smartwatch%20with%20black%20band%20and%20colorful%20display%20showing%20fitness%20metrics%2C%20sleek%20design%2C%20minimalist%20product%20photography%20on%20clean%20white%20background%2C%20professional%20product%20shot%20with%20soft%20shadows&width=80&height=80&seq=prod2&orientation=squarish' },
+    { id: 3, name: 'Ultra HD Monitor 27"', price: '$349.99', stock: 18, sales: 98, image: 'https://readdy.ai/api/search-image?query=27%20inch%20ultra%20HD%20computer%20monitor%20with%20thin%20bezels%2C%20sleek%20modern%20design%2C%20displaying%20colorful%20desktop%20wallpaper%2C%20minimalist%20product%20photography%20on%20clean%20white%20background%2C%20professional%20product%20shot%20with%20soft%20shadows&width=80&height=80&seq=prod3&orientation=squarish' },
+    { id: 4, name: 'Ergonomic Office Chair', price: '$189.99', stock: 27, sales: 87, image: 'https://readdy.ai/api/search-image?query=Ergonomic%20office%20chair%20with%20mesh%20back%2C%20adjustable%20armrests%20and%20lumbar%20support%2C%20black%20color%20with%20chrome%20base%2C%20minimalist%20product%20photography%20on%20clean%20white%20background%2C%20professional%20product%20shot%20with%20soft%20shadows&width=80&height=80&seq=prod4&orientation=squarish' }
+  ];
+
+  return (
+    <div className="flex h-screen bg-gray-50">
+      {/* Sidebar */}
+      <div className={`bg-indigo-800 text-white ${sidebarCollapsed ? 'w-16' : 'w-64'} transition-all duration-300 ease-in-out`}>
+        <div className="p-4 flex items-center justify-between">
+          {!sidebarCollapsed && <h1 className="text-xl font-bold">E-Commerce</h1>}
+          <button onClick={toggleSidebar} className="p-1 rounded-full hover:bg-indigo-700 cursor-pointer !rounded-button whitespace-nowrap">
+            <i className={`fas ${sidebarCollapsed ? 'fa-chevron-right' : 'fa-chevron-left'}`}></i>
+          </button>
+        </div>
+        <nav className="mt-6">
+          <div className={`px-4 py-3 ${activeNav === 'dashboard' ? 'bg-indigo-900' : 'hover:bg-indigo-700'} cursor-pointer flex items-center`} onClick={() => setActiveNav('dashboard')}>
+            <i className="fas fa-tachometer-alt"></i>
+            {!sidebarCollapsed && <span className="ml-3">Dashboard</span>}
+          </div>
+          <div className={`px-4 py-3 ${activeNav === 'orders' ? 'bg-indigo-900' : 'hover:bg-indigo-700'} cursor-pointer flex items-center`} onClick={() => setActiveNav('orders')}>
+            <i className="fas fa-shopping-cart"></i>
+            {!sidebarCollapsed && <span className="ml-3">Orders</span>}
+          </div>
+          <div className={`px-4 py-3 ${activeNav === 'products' ? 'bg-indigo-900' : 'hover:bg-indigo-700'} cursor-pointer flex items-center`} onClick={() => setActiveNav('products')}>
+            <i className="fas fa-box"></i>
+            {!sidebarCollapsed && <span className="ml-3">Products</span>}
+          </div>
+          <div className={`px-4 py-3 ${activeNav === 'customers' ? 'bg-indigo-900' : 'hover:bg-indigo-700'} cursor-pointer flex items-center`} onClick={() => setActiveNav('customers')}>
+            <i className="fas fa-users"></i>
+            {!sidebarCollapsed && <span className="ml-3">Customers</span>}
+          </div>
+          <div className={`px-4 py-3 ${activeNav === 'analytics' ? 'bg-indigo-900' : 'hover:bg-indigo-700'} cursor-pointer flex items-center`} onClick={() => setActiveNav('analytics')}>
+            <i className="fas fa-chart-line"></i>
+            {!sidebarCollapsed && <span className="ml-3">Analytics</span>}
+          </div>
+          <div className={`px-4 py-3 ${activeNav === 'settings' ? 'bg-indigo-900' : 'hover:bg-indigo-700'} cursor-pointer flex items-center`} onClick={() => setActiveNav('settings')}>
+            <i className="fas fa-cog"></i>
+            {!sidebarCollapsed && <span className="ml-3">Settings</span>}
+          </div>
+        </nav>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <header className="bg-white shadow-sm z-10">
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center">
+              <h2 className="text-xl font-semibold text-gray-800">Dashboard</h2>
+            </div>
+            <div className="flex-1 mx-10">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                />
+                <div className="absolute left-3 top-2.5 text-gray-400">
+                  <i className="fas fa-search"></i>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <button 
+                  onClick={() => setShowNotifications(!showNotifications)} 
+                  className="text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer !rounded-button whitespace-nowrap"
+                >
+                  <i className="fas fa-bell text-xl"></i>
+                  {notifications > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {notifications}
+                    </span>
+                  )}
+                </button>
+                {showNotifications && (
+                  <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg py-2 z-20 border border-gray-200">
+                    <div className="px-4 py-2 border-b border-gray-200">
+                      <h3 className="text-sm font-semibold text-gray-700">Notifications</h3>
+                    </div>
+                    <div className="px-4 py-2 hover:bg-gray-50 cursor-pointer">
+                      <p className="text-sm text-gray-700">New order #ORD-7352 received</p>
+                      <p className="text-xs text-gray-500">2 minutes ago</p>
+                    </div>
+                    <div className="px-4 py-2 hover:bg-gray-50 cursor-pointer">
+                      <p className="text-sm text-gray-700">Payment for order #ORD-7348 confirmed</p>
+                      <p className="text-xs text-gray-500">1 hour ago</p>
+                    </div>
+                    <div className="px-4 py-2 hover:bg-gray-50 cursor-pointer">
+                      <p className="text-sm text-gray-700">Customer review received: 5 stars</p>
+                      <p className="text-xs text-gray-500">3 hours ago</p>
+                    </div>
+                    <div className="px-4 py-2 text-center text-sm text-indigo-600 hover:underline cursor-pointer">
+                      View all notifications
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="relative">
+                <button 
+                  onClick={() => setShowUserDropdown(!showUserDropdown)} 
+                  className="flex items-center focus:outline-none cursor-pointer !rounded-button whitespace-nowrap"
+                >
+                  <img 
+                    src="https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20young%20business%20person%20with%20neutral%20expression%2C%20clean%20professional%20background%2C%20high%20quality%20portrait%20suitable%20for%20profile%20picture%2C%20minimalist%20style&width=40&height=40&seq=avatar1&orientation=squarish" 
+                    alt="User" 
+                    className="h-8 w-8 rounded-full object-cover"
+                  />
+                  <span className="ml-2 text-gray-700">Admin User</span>
+                  <i className="fas fa-chevron-down ml-2 text-gray-500 text-xs"></i>
+                </button>
+                {showUserDropdown && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-20 border border-gray-200">
+                    <a href="#profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Your Profile</a>
+                    <a href="#settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</a>
+                    <div className="border-t border-gray-100"></div>
+                    <a href="#logout" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Main Content */}
+        <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
+          {/* Date Range Selector */}
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold text-gray-800">Dashboard Overview</h1>
+            <div className="flex items-center space-x-2">
+              <button 
+                className={`px-3 py-1.5 text-sm font-medium rounded-md ${dateRange === '7d' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'} cursor-pointer !rounded-button whitespace-nowrap`}
+                onClick={() => setDateRange('7d')}
+              >
+                7 Days
+              </button>
+              <button 
+                className={`px-3 py-1.5 text-sm font-medium rounded-md ${dateRange === '30d' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'} cursor-pointer !rounded-button whitespace-nowrap`}
+                onClick={() => setDateRange('30d')}
+              >
+                30 Days
+              </button>
+              <button 
+                className={`px-3 py-1.5 text-sm font-medium rounded-md ${dateRange === '90d' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'} cursor-pointer !rounded-button whitespace-nowrap`}
+                onClick={() => setDateRange('90d')}
+              >
+                90 Days
+              </button>
+              <button 
+                className={`px-3 py-1.5 text-sm font-medium rounded-md ${dateRange === 'custom' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'} cursor-pointer !rounded-button whitespace-nowrap`}
+                onClick={() => setDateRange('custom')}
+              >
+                Custom
+              </button>
+              <button className="ml-2 p-2 bg-white rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 cursor-pointer !rounded-button whitespace-nowrap">
+                <i className="fas fa-download"></i>
+                <span className="ml-1">Export</span>
+              </button>
+              <button className="p-2 bg-white rounded-md text-gray-500 hover:text-gray-700 hover:bg-gray-100 cursor-pointer !rounded-button whitespace-nowrap">
+                <i className="fas fa-sync-alt"></i>
+              </button>
+            </div>
+          </div>
+
+          {/* KPI Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Total Revenue</p>
+                  <h3 className="text-2xl font-bold text-gray-800 mt-1">$126,580</h3>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center">
+                  <i className="fas fa-dollar-sign text-indigo-600 text-xl"></i>
+                </div>
+              </div>
+              <div className="flex items-center mt-4">
+                <span className="text-green-500 flex items-center text-sm font-medium">
+                  <i className="fas fa-arrow-up mr-1"></i> 12.5%
+                </span>
+                <span className="text-gray-500 text-sm ml-2">vs. last period</span>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Total Orders</p>
+                  <h3 className="text-2xl font-bold text-gray-800 mt-1">1,245</h3>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                  <i className="fas fa-shopping-cart text-blue-600 text-xl"></i>
+                </div>
+              </div>
+              <div className="flex items-center mt-4">
+                <span className="text-green-500 flex items-center text-sm font-medium">
+                  <i className="fas fa-arrow-up mr-1"></i> 8.2%
+                </span>
+                <span className="text-gray-500 text-sm ml-2">vs. last period</span>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Active Users</p>
+                  <h3 className="text-2xl font-bold text-gray-800 mt-1">3,782</h3>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
+                  <i className="fas fa-users text-green-600 text-xl"></i>
+                </div>
+              </div>
+              <div className="flex items-center mt-4">
+                <span className="text-green-500 flex items-center text-sm font-medium">
+                  <i className="fas fa-arrow-up mr-1"></i> 5.3%
+                </span>
+                <span className="text-gray-500 text-sm ml-2">vs. last period</span>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Conversion Rate</p>
+                  <h3 className="text-2xl font-bold text-gray-800 mt-1">4.5%</h3>
+                </div>
+                <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
+                  <i className="fas fa-chart-pie text-purple-600 text-xl"></i>
+                </div>
+              </div>
+              <div className="flex items-center mt-4">
+                <span className="text-red-500 flex items-center text-sm font-medium">
+                  <i className="fas fa-arrow-down mr-1"></i> 1.2%
+                </span>
+                <span className="text-gray-500 text-sm ml-2">vs. last period</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Charts */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-800">Sales Overview</h3>
+                <div className="flex space-x-2">
+                  <button className="text-sm text-gray-500 hover:text-gray-700 cursor-pointer !rounded-button whitespace-nowrap">Daily</button>
+                  <button className="text-sm text-indigo-600 font-medium cursor-pointer !rounded-button whitespace-nowrap">Weekly</button>
+                  <button className="text-sm text-gray-500 hover:text-gray-700 cursor-pointer !rounded-button whitespace-nowrap">Monthly</button>
+                </div>
+              </div>
+              <div id="sales-chart" className="h-80 w-full"></div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold text-gray-800">Revenue Distribution</h3>
+                <button className="text-sm text-gray-500 hover:text-gray-700 cursor-pointer !rounded-button whitespace-nowrap">
+                  <i className="fas fa-ellipsis-h"></i>
+                </button>
+              </div>
+              <div id="revenue-chart" className="h-80 w-full"></div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6 mb-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-800">Order Status</h3>
+              <div className="flex space-x-2">
+                <button className="text-sm text-gray-500 hover:text-gray-700 cursor-pointer !rounded-button whitespace-nowrap">Daily</button>
+                <button className="text-sm text-indigo-600 font-medium cursor-pointer !rounded-button whitespace-nowrap">Weekly</button>
+                <button className="text-sm text-gray-500 hover:text-gray-700 cursor-pointer !rounded-button whitespace-nowrap">Monthly</button>
+              </div>
+            </div>
+            <div id="order-chart" className="h-80 w-full"></div>
+          </div>
+
+          {/* Recent Orders & Top Products */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 bg-white rounded-lg shadow">
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-semibold text-gray-800">Recent Orders</h3>
+                  <a href="#viewall" className="text-sm text-indigo-600 hover:text-indigo-800 cursor-pointer">View All</a>
+                </div>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {recentOrders.map((order, index) => (
+                      <tr key={index} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600">{order.id}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{order.customer}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            ${order.status === 'Completed' ? 'bg-green-100 text-green-800' : 
+                              order.status === 'Processing' ? 'bg-yellow-100 text-yellow-800' : 
+                                'bg-red-100 text-red-800'}`}>
+                            {order.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{order.amount}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.date}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          <button className="text-indigo-600 hover:text-indigo-900 mr-3 cursor-pointer !rounded-button whitespace-nowrap">
+                            <i className="fas fa-eye"></i>
+                          </button>
+                          <button className="text-gray-600 hover:text-gray-900 cursor-pointer !rounded-button whitespace-nowrap">
+                            <i className="fas fa-ellipsis-v"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow">
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-semibold text-gray-800">Top Products</h3>
+                  <a href="#viewall" className="text-sm text-indigo-600 hover:text-indigo-800 cursor-pointer">View All</a>
+                </div>
+              </div>
+              <div className="p-6 space-y-6">
+                {topProducts.map((product, index) => (
+                  <div key={index} className="flex items-center">
+                    <img src={product.image} alt={product.name} className="w-12 h-12 rounded-lg object-cover" />
+                    <div className="ml-4 flex-1">
+                      <h4 className="text-sm font-medium text-gray-900">{product.name}</h4>
+                      <div className="flex items-center justify-between mt-1">
+                        <div className="flex items-center">
+                          <span className="text-sm font-medium text-gray-900">{product.price}</span>
+                          <span className={`ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${product.stock > 20 ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                            {product.stock} in stock
+                          </span>
+                        </div>
+                        <span className="text-sm text-gray-500">{product.sales} sales</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+};
+
+export default App;
+
